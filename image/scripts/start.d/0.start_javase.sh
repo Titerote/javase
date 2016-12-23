@@ -37,6 +37,12 @@ JAVA_HEAP=$(/opt/produban/bin/java-buildpack-memory-calculator -memoryWeights=he
 
 if [ -n "$ARTIFACT_URL" ]
 then
+  echo "INFO: Testing $ARTIFACT_URL for Redirect "
+  location=$(curl -I "$ARTIFACT_URL" | grep ^Location) 
+  if [ ! -z "$location" ]; then
+    ARTIFACT_URL=$(echo $location | sed -e 's/Location://' | tr -d '[:space:]')
+    echo "INFO: Redirected to $ARTIFACT_URL "
+  fi;
   file=`basename "$ARTIFACT_URL"`
   wget -q --no-check-certificate --connect-timeout=5 --read-timeout=10 --tries=2 -O "/tmp/$file" "$ARTIFACT_URL"
 
